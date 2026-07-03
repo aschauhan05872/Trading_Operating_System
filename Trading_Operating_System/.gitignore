@@ -1,0 +1,17 @@
+# Build outputs
+*.ex5
+*.ex4
+*.dll
+*.obj
+*.tmp
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Editor files
+.vscode/
+.idea/
+
+# Logs
+*.log
