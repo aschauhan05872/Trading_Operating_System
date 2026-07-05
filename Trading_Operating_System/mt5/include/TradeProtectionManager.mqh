@@ -39,8 +39,8 @@ public:
          return false;
       }
 
-      // Feature disabled -> always allow
-      if(!m_config->IsSLRiskReductionOnlyEnabled())
+      // Feature disabled . always allow
+      if(!m_config.IsSLRiskReductionOnlyEnabled())
          return true;
 
       if(current_sl <= 0.0 || proposed_sl <= 0.0)
@@ -99,8 +99,8 @@ public:
          return false;
       }
 
-      // Feature disabled -> always allow
-      if(!m_config->IsTPRewardIncreaseOnlyEnabled())
+      // Feature disabled . always allow
+      if(!m_config.IsTPRewardIncreaseOnlyEnabled())
          return true;
 
       if(current_tp <= 0.0 || proposed_tp <= 0.0)
@@ -154,7 +154,7 @@ public:
       if(m_config == NULL)
          return false;
 
-      if(!m_config->IsAutoBreakevenEnabled())
+      if(!m_config.IsAutoBreakevenEnabled())
          return false;
 
       if(entry_price <= 0.0 ||
@@ -172,7 +172,7 @@ public:
          return false;
 
       double trigger_percent =
-         m_config->GetBreakevenTriggerPercent();
+         m_config.GetBreakevenTriggerPercent();
 
       double trigger_distance =
          target_distance *

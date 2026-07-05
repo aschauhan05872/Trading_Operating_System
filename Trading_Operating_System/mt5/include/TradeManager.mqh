@@ -44,7 +44,7 @@ public:
 
       m_symbol =
          (m_lot_manager != NULL)
-         ? m_lot_manager->GetSymbol()
+         ? m_lot_manager.GetSymbol()
          : "";
    }
 
@@ -53,13 +53,13 @@ public:
       m_last_error_message = "";
 
       if(m_risk_manager != NULL)
-         m_risk_manager->Initialize();
+         m_risk_manager.Initialize();
 
       if(m_trade_protection != NULL)
-         m_trade_protection->Initialize();
+         m_trade_protection.Initialize();
 
       if(m_cooldown != NULL)
-         m_cooldown->Initialize();
+         m_cooldown.Initialize();
    }
 
    bool OpenBuy(
@@ -193,13 +193,13 @@ public:
       double current_sl =
          PositionGetDouble(POSITION_SL);
 
-      if(!m_trade_protection->CanModifyStopLoss(
+      if(!m_trade_protection.CanModifyStopLoss(
             position_type,
             current_sl,
             new_sl))
       {
          m_last_error_message =
-            m_trade_protection->GetLastRejectionReason();
+            m_trade_protection.GetLastRejectionReason();
 
          return false;
       }
@@ -247,13 +247,13 @@ public:
       double current_tp =
          PositionGetDouble(POSITION_TP);
 
-      if(!m_trade_protection->CanModifyTakeProfit(
+      if(!m_trade_protection.CanModifyTakeProfit(
             position_type,
             current_tp,
             new_tp))
       {
          m_last_error_message =
-            m_trade_protection->GetLastRejectionReason();
+            m_trade_protection.GetLastRejectionReason();
 
          return false;
       }
@@ -299,7 +299,7 @@ public:
 
       if(m_cooldown != NULL)
       {
-         m_cooldown->StartTradeCooldown();
+         m_cooldown.StartTradeCooldown();
       }
 
       return true;
@@ -344,7 +344,7 @@ public:
 
       if(m_cooldown != NULL)
       {
-         m_cooldown->StartEmergencyCooldown();
+         m_cooldown.StartEmergencyCooldown();
       }
 
       return true;
@@ -370,7 +370,7 @@ private:
          return false;
       }
 
-      if(!m_risk_manager->CanOpenTrade(
+      if(!m_risk_manager.CanOpenTrade(
             lot,
             sl_points,
             tp_points))
@@ -378,7 +378,7 @@ private:
          m_last_error_message =
             StringFormat(
                "Risk validation failed: %s",
-               m_risk_manager->GetLastRejectionReason());
+               m_risk_manager.GetLastRejectionReason());
 
          return false;
       }

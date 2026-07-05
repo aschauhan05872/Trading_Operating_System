@@ -84,14 +84,14 @@ private:
          return false;
       }
 
-      if(m_daily_limit->IsDailyDrawdownReached())
+      if(m_daily_limit.IsDailyDrawdownReached())
       {
          m_last_rejection_reason =
             "Daily drawdown limit reached.";
          return false;
       }
 
-      if(m_daily_limit->IsDailyLossCountReached())
+      if(m_daily_limit.IsDailyLossCountReached())
       {
          m_last_rejection_reason =
             "Maximum losing trades reached for today.";
@@ -110,10 +110,10 @@ private:
          return false;
       }
 
-      if(m_cooldown->IsCooldownActive())
+      if(m_cooldown.IsCooldownActive())
       {
          int remaining_seconds =
-            m_cooldown->GetRemainingCooldownSeconds();
+            m_cooldown.GetRemainingCooldownSeconds();
 
          int remaining_minutes =
             (remaining_seconds + 59) / 60;
@@ -147,19 +147,19 @@ private:
          if(PositionSelectByTicket(ticket))
          {
             if(PositionGetString(POSITION_SYMBOL) ==
-               m_lot_manager->GetSymbol())
+               m_lot_manager.GetSymbol())
             {
                open_positions++;
             }
          }
       }
 
-      if(open_positions >= m_config->GetMaxOpenTrades())
+      if(open_positions >= m_config.GetMaxOpenTrades())
       {
          m_last_rejection_reason =
             StringFormat(
                "Maximum open positions reached (%d).",
-               m_config->GetMaxOpenTrades());
+               m_config.GetMaxOpenTrades());
 
          return false;
       }
@@ -184,7 +184,7 @@ private:
       }
 
       double max_allowed =
-         m_lot_manager->GetMaximumAllowedLot();
+         m_lot_manager.GetMaximumAllowedLot();
 
       if(requested_lot > max_allowed)
       {
@@ -197,7 +197,7 @@ private:
          return false;
       }
 
-      if(!m_lot_manager->CanTradeLot(requested_lot))
+      if(!m_lot_manager.CanTradeLot(requested_lot))
       {
          m_last_rejection_reason =
             "Requested lot violates symbol volume rules.";
@@ -219,10 +219,10 @@ private:
       }
 
       double allowed_risk =
-         m_lot_manager->GetCurrentRiskAmount();
+         m_lot_manager.GetCurrentRiskAmount();
 
       double actual_risk =
-         m_lot_manager->CalculateRiskAmount(
+         m_lot_manager.CalculateRiskAmount(
             requested_lot,
             stop_loss_points);
 
@@ -255,13 +255,13 @@ private:
       double rr =
          take_profit_points / stop_loss_points;
 
-      if(rr < m_config->GetMinimumRR())
+      if(rr < m_config.GetMinimumRR())
       {
          m_last_rejection_reason =
             StringFormat(
                "RR %.2f below minimum %.2f.",
                rr,
-               m_config->GetMinimumRR());
+               m_config.GetMinimumRR());
 
          return false;
       }
@@ -276,6 +276,6 @@ public:
       if(m_lot_manager == NULL)
          return 0.0;
 
-      return m_lot_manager->GetCurrentRiskAmount();
+      return m_lot_manager.GetCurrentRiskAmount();
    }
 };

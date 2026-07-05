@@ -31,7 +31,7 @@ public:
          return 0.0;
 
       double equity = AccountInfoDouble(ACCOUNT_EQUITY);
-      return equity * m_config->GetRiskPerTradePercent() / 100.0;
+      return equity * m_config.GetRiskPerTradePercent() / 100.0;
    }
 
    double GetMaximumAllowedLot()

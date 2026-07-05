@@ -70,7 +70,7 @@ public:
       // Dynamic floating daily drawdown
       m_daily_lock_level =
          m_peak_equity_today *
-         (1.0 - (m_config->GetDailyDrawdownLimitPercent() / 100.0));
+         (1.0 - (m_config.GetDailyDrawdownLimitPercent() / 100.0));
    }
 
    void ResetForNewDay()
@@ -83,7 +83,7 @@ public:
 
       m_daily_lock_level =
          m_peak_equity_today *
-         (1.0 - (m_config->GetDailyDrawdownLimitPercent() / 100.0));
+         (1.0 - (m_config.GetDailyDrawdownLimitPercent() / 100.0));
 
       m_daily_loss_count = 0;
 
@@ -161,7 +161,7 @@ public:
    {
       return
          m_daily_loss_count
-         >= m_config->GetMaxLosingTradesPerDay();
+         >= m_config.GetMaxLosingTradesPerDay();
    }
 
    bool CanTradeToday()

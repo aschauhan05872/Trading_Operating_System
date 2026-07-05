@@ -30,14 +30,14 @@ public:
    void StartTradeCooldown()
    {
       datetime now = TimeCurrent();
-      int cooldown_minutes = m_config->GetCooldownMinutes();
+      int cooldown_minutes = m_config.GetCooldownMinutes();
       m_normal_cooldown_end = now + cooldown_minutes * 60;
    }
 
    void StartEmergencyCooldown()
    {
       datetime now = TimeCurrent();
-      int lock_minutes = m_config->GetEmergencyLockDurationMinutes();
+      int lock_minutes = m_config.GetEmergencyLockDurationMinutes();
       m_emergency_cooldown_end = now + lock_minutes * 60;
    }
 

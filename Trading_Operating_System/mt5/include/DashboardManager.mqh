@@ -1,6 +1,6 @@
 //+------------------------------------------------------------------+
-//|                                               DashboardManager.mqh |
-//| Purpose: Display TOS status information on MT5 chart             |
+//|                                                DashboardManager.mqh
+//| Purpose: Display TOS status information on MT5 chart
 //+------------------------------------------------------------------+
 #property strict
 
@@ -45,7 +45,7 @@ public:
       if(m_config == NULL)
          return;
 
-      if(!m_config->IsDashboardEnabled())
+      if(!m_config.IsDashboardEnabled())
          return;
 
       DrawDashboard();
@@ -56,7 +56,7 @@ public:
       if(m_config == NULL)
          return;
 
-      if(!m_config->IsDashboardEnabled())
+      if(!m_config.IsDashboardEnabled())
       {
          ClearDashboard();
          return;
@@ -67,9 +67,9 @@ public:
 
    void DrawDashboard()
    {
-      int x = 10;
-      int y = 10;
-      int row_height = 18;
+      int x = 20;
+      int y = 100;
+      int row_height = 23;
 
       CreateLabel(
          m_label_names[0],
@@ -164,6 +164,8 @@ public:
          StringFormat("Trading Status: %s",
          GetTradingStatus()),
          x,y);
+
+      ChartRedraw();
    }
 
    void ClearDashboard()
@@ -180,19 +182,19 @@ public:
    string GetTradingStatus()
    {
       if(m_daily_limit != NULL &&
-         m_daily_limit->IsDailyDrawdownReached())
+         m_daily_limit.IsDailyDrawdownReached())
       {
          return "LOCKED - Daily DD";
       }
 
       if(m_daily_limit != NULL &&
-         m_daily_limit->IsDailyLossCountReached())
+         m_daily_limit.IsDailyLossCountReached())
       {
          return "LOCKED - Max Losses";
       }
 
       if(m_cooldown != NULL &&
-         m_cooldown->IsCooldownActive())
+         m_cooldown.IsCooldownActive())
       {
          return "LOCKED - Cooldown";
       }
@@ -217,21 +219,24 @@ private:
 
       if(ObjectFind(chart_id,name) < 0)
       {
-         ObjectCreate(
-            chart_id,
-            name,
-            OBJ_LABEL,
-            0,
-            0,
-            0
-         );
+         if(!ObjectCreate(
+               chart_id,
+               name,
+               OBJ_LABEL,
+               0,
+               0,
+               0))
+         {
+            Print("Failed to create dashboard label: ",name);
+            return;
+         }
       }
 
       ObjectSetInteger(
          chart_id,
          name,
          OBJPROP_CORNER,
-         CORNER_RIGHT_UPPER);
+         CORNER_LEFT_UPPER);
 
       ObjectSetInteger(
          chart_id,
@@ -256,6 +261,24 @@ private:
          name,
          OBJPROP_FONTSIZE,
          10);
+
+      ObjectSetInteger(
+         chart_id,
+         name,
+         OBJPROP_BACK,
+         false);
+
+      ObjectSetInteger(
+         chart_id,
+         name,
+         OBJPROP_SELECTABLE,
+         false);
+
+      ObjectSetInteger(
+         chart_id,
+         name,
+         OBJPROP_HIDDEN,
+         false);
 
       ObjectSetString(
          chart_id,
@@ -284,30 +307,34 @@ private:
 
    double GetPeakEquity()
    {
-      return (m_daily_limit != NULL)
-         ? m_daily_limit->GetPeakEquityToday()
-         : 0.0;
+      if(m_daily_limit == NULL)
+         return 0.0;
+
+      return m_daily_limit.GetPeakEquityToday();
    }
 
    double GetDailyLockLevel()
    {
-      return (m_daily_limit != NULL)
-         ? m_daily_limit->GetDailyLockLevel()
-         : 0.0;
+      if(m_daily_limit == NULL)
+         return 0.0;
+
+      return m_daily_limit.GetDailyLockLevel();
    }
 
    double GetRemainingDailyLoss()
    {
-      return (m_daily_limit != NULL)
-         ? m_daily_limit->GetRemainingDailyLoss()
-         : 0.0;
+      if(m_daily_limit == NULL)
+         return 0.0;
+
+      return m_daily_limit.GetRemainingDailyLoss();
    }
 
    int GetLosingTradesCount()
    {
-      return (m_daily_limit != NULL)
-         ? m_daily_limit->GetDailyLossCount()
-         : 0;
+      if(m_daily_limit == NULL)
+         return 0;
+
+      return m_daily_limit.GetDailyLossCount();
    }
 
    string GetCooldownStatus()
@@ -315,7 +342,7 @@ private:
       if(m_cooldown == NULL)
          return "Unknown";
 
-      return m_cooldown->IsCooldownActive()
+      return m_cooldown.IsCooldownActive()
          ? "ACTIVE"
          : "CLEAR";
    }
@@ -326,7 +353,7 @@ private:
          return "00:00";
 
       int seconds =
-         m_cooldown->GetRemainingCooldownSeconds();
+         m_cooldown.GetRemainingCooldownSeconds();
 
       int minutes = seconds / 60;
       int remain  = seconds % 60;
@@ -334,22 +361,23 @@ private:
       return StringFormat(
          "%02d:%02d",
          minutes,
-         remain
-      );
+         remain);
    }
 
    double GetMaximumAllowedLot()
    {
-      return (m_lot_manager != NULL)
-         ? m_lot_manager->GetMaximumAllowedLot()
-         : 0.0;
+      if(m_lot_manager == NULL)
+         return 0.0;
+
+      return m_lot_manager.GetMaximumAllowedLot();
    }
 
    double GetRiskPerTradeAmount()
    {
-      return (m_lot_manager != NULL)
-         ? m_lot_manager->GetCurrentRiskAmount()
-         : 0.0;
+      if(m_lot_manager == NULL)
+         return 0.0;
+
+      return m_lot_manager.GetCurrentRiskAmount();
    }
 
    int GetOpenPositionCount()
@@ -358,7 +386,7 @@ private:
          return PositionsTotal();
 
       string symbol =
-         m_lot_manager->GetSymbol();
+         m_lot_manager.GetSymbol();
 
       int count = 0;
 

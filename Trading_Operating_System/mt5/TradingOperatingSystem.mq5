@@ -32,6 +32,12 @@ DashboardManager*          g_dashboard         = NULL;
 int OnInit()
 {
    Print("Initializing Trading Operating System Phase 1...");
+   ObjectCreate(0,"TOS_TEST",OBJ_LABEL,0,0,0);
+   ObjectSetInteger(0,"TOS_TEST",OBJPROP_CORNER,CORNER_LEFT_UPPER);
+   ObjectSetInteger(0,"TOS_TEST",OBJPROP_XDISTANCE,20);
+   ObjectSetInteger(0,"TOS_TEST",OBJPROP_YDISTANCE,20);
+   ObjectSetInteger(0,"TOS_TEST",OBJPROP_COLOR,clrRed);
+   ObjectSetString(0,"TOS_TEST",OBJPROP_TEXT,"TOS DASHBOARD TEST");
 
    //==============================================================
    // Create Managers
@@ -43,6 +49,7 @@ int OnInit()
       return INIT_FAILED;
 
    g_dailyLimit = new DailyLimitManager(g_config);
+   
 
    if(g_dailyLimit == NULL)
       return INIT_FAILED;
@@ -103,12 +110,13 @@ int OnInit()
    // Initialize Managers
    //==============================================================
 
-   g_dailyLimit->Initialize();
-   g_cooldown->Initialize();
-   g_riskManager->Initialize();
-   g_tradeProtection->Initialize();
-   g_tradeManager->Initialize();
-   g_dashboard->Initialize();
+   g_dailyLimit.Initialize();
+   g_dailyLimit.ResetForNewDay();
+   g_cooldown.Initialize();
+   g_riskManager.Initialize();
+   g_tradeProtection.Initialize();
+   g_tradeManager.Initialize();
+   g_dashboard.Initialize();
 
    Print("TOS Phase 1 initialized successfully.");
 
@@ -121,13 +129,13 @@ int OnInit()
 void OnTick()
 {
    if(g_dailyLimit != NULL)
-      g_dailyLimit->Update();
+      g_dailyLimit.Update();
 
    if(g_cooldown != NULL)
-      g_cooldown->Update();
+      g_cooldown.Update();
 
    if(g_dashboard != NULL)
-      g_dashboard->Update();
+      g_dashboard.Update();
 }
 
 //+------------------------------------------------------------------+
@@ -139,7 +147,7 @@ void OnDeinit(const int reason)
 
    if(g_dashboard != NULL)
    {
-      g_dashboard->ClearDashboard();
+      g_dashboard.ClearDashboard();
       delete g_dashboard;
       g_dashboard = NULL;
    }
