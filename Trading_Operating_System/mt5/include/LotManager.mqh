@@ -13,10 +13,10 @@ private:
    double            m_lot_step;
    double            m_max_lot;
    string            m_symbol;
-   ConfigManager* m_config;
+   ConfigManager*    m_config;
 
 public:
-   LotManager(cConfigManager* config, const string symbol)
+   LotManager(ConfigManager* config, const string symbol)
    {
       m_config = config;
       m_symbol = symbol;
@@ -27,6 +27,9 @@ public:
 
    double GetCurrentRiskAmount()
    {
+      if(m_config == NULL)
+         return 0.0;
+
       double equity = AccountInfoDouble(ACCOUNT_EQUITY);
       return equity * m_config->GetRiskPerTradePercent() / 100.0;
    }
@@ -53,12 +56,12 @@ public:
       return MathMin(cap, m_max_lot);
    }
 
-   double CalculateRiskBasedLot(const ConfigManager &config, double stop_loss_points)
+   double CalculateRiskBasedLot(double stop_loss_points)
    {
       if(stop_loss_points <= 0.0)
          return 0.0;
 
-      double risk_amount = GetCurrentRiskAmount(config);
+      double risk_amount = GetCurrentRiskAmount();
       double tick_value = SymbolInfoDouble(m_symbol, SYMBOL_TRADE_TICK_VALUE);
       double tick_size = SymbolInfoDouble(m_symbol, SYMBOL_TRADE_TICK_SIZE);
 
@@ -66,13 +69,31 @@ public:
          return 0.0;
 
       double value_per_point = tick_value / tick_size;
+      // TODO:
+      // Validate risk calculations on Trading Global XAUUSD.
+      // Gold contract specifications vary across brokers.
       double lots = risk_amount / (stop_loss_points * value_per_point);
       return NormalizeLot(lots);
    }
 
-   double GetFinalAllowedLot(const ConfigManager &config, double stop_loss_points)
+   double CalculateRiskAmount(double requested_lot, double stop_loss_points)
    {
-      double risk_lot = CalculateRiskBasedLot(config, stop_loss_points);
+      if(requested_lot <= 0.0 || stop_loss_points <= 0.0)
+         return 0.0;
+
+      double tick_value = SymbolInfoDouble(m_symbol, SYMBOL_TRADE_TICK_VALUE);
+      double tick_size = SymbolInfoDouble(m_symbol, SYMBOL_TRADE_TICK_SIZE);
+
+      if(tick_value <= 0.0 || tick_size <= 0.0)
+         return 0.0;
+
+      double value_per_point = tick_value / tick_size;
+      return requested_lot * stop_loss_points * value_per_point;
+   }
+
+   double GetFinalAllowedLot(double stop_loss_points)
+   {
+      double risk_lot = CalculateRiskBasedLot(stop_loss_points);
       double max_allowed = GetMaximumAllowedLot();
       return MathMin(risk_lot, max_allowed);
    }
@@ -86,6 +107,11 @@ public:
       double max_allowed = GetMaximumAllowedLot();
 
       return (requested_lot <= max_allowed) && (requested_lot >= m_min_lot);
+   }
+
+   string GetSymbol()
+   {
+      return m_symbol;
    }
 
 private:
